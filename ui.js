@@ -481,7 +481,7 @@
     keyProxy.setAttribute('autocomplete', 'off');
     keyProxy.setAttribute('aria-label', '棋格数字输入');
     keyProxy.style.cssText =
-      'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;margin:0;padding:0;border:0;pointer-events:none;';
+      'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;margin:0;padding:0;border:0;pointer-events:none;font-size:16px;';
     keyProxy.addEventListener('compositionend', onKeyProxyCompositionEnd, false);
     document.body.appendChild(keyProxy);
   }

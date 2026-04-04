@@ -8,7 +8,6 @@
 1. JavaScript
 2. HTML
 3. CSS
-
 ## 项目结构
 1. generator.js: 数独生成器
 2. solver.js: 数独求解器

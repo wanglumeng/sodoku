@@ -1,0 +1,12 @@
+{
+  "name": "数独",
+  "short_name": "数独",
+  "description": "网页数独：生成、求解、深浅主题，支持手机与电脑",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f4f6f9",
+  "theme_color": "#3b82f6",
+  "lang": "zh-CN"
+}
