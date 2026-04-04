@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>数独</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <h1 class="title">数独</h1>
+        <div class="toolbar">
+          <button type="button" class="btn btn-primary" id="btn-new">新游戏</button>
+          <button type="button" class="btn" id="btn-check">检查谜题</button>
+          <button type="button" class="btn" id="btn-solve">求解</button>
+          <button type="button" class="btn btn-ghost" id="btn-theme" aria-label="切换主题">主题</button>
+        </div>
+      </header>
+
+      <p class="message" id="message" role="status" aria-live="polite"></p>
+
+      <div class="board-wrap">
+        <div class="board" id="board" aria-label="数独棋盘"></div>
+      </div>
+
+      <div class="palette" id="palette" aria-label="数字输入"></div>
+
+      <dialog class="modal" id="modal-difficulty">
+        <div class="modal-form">
+          <h2 class="modal-title">选择难度</h2>
+          <div class="difficulty-btns">
+            <button type="button" class="btn btn-block" data-difficulty="easy">简单（40 空）</button>
+            <button type="button" class="btn btn-block" data-difficulty="medium">中等（50 空）</button>
+            <button type="button" class="btn btn-block" data-difficulty="hard">困难（60 空）</button>
+          </div>
+          <button type="button" class="btn btn-ghost btn-block" id="modal-cancel">取消</button>
+        </div>
+      </dialog>
+
+      <dialog class="modal modal-victory" id="modal-victory" aria-labelledby="victory-title">
+        <div class="modal-form victory-form">
+          <h2 class="modal-title victory-title" id="victory-title">完美通关</h2>
+          <p class="victory-sub">数独已正确完成</p>
+          <p class="victory-dance-caption" aria-hidden="true">企鹅为你轻盈起舞</p>
+          <div class="penguin-stage" aria-hidden="true">
+            <div class="penguin">
+              <div class="penguin-torso">
+                <div class="penguin-belly"></div>
+                <div class="penguin-face">
+                  <span class="penguin-eye"></span>
+                  <span class="penguin-eye"></span>
+                  <span class="penguin-beak"></span>
+                </div>
+              </div>
+              <span class="penguin-flipper penguin-flipper-l"></span>
+              <span class="penguin-flipper penguin-flipper-r"></span>
+              <span class="penguin-foot penguin-foot-l"></span>
+              <span class="penguin-foot penguin-foot-r"></span>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary btn-block" id="victory-close">太棒了</button>
+        </div>
+      </dialog>
+    </div>
+
+    <script src="solver.js"></script>
+    <script src="generator.js"></script>
+    <script src="ui.js"></script>
+  </body>
+</html>
