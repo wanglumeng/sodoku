@@ -226,7 +226,7 @@ body {
   opacity: 0.9;
 }
 
-/* 底部 1–9：两行 12345 / 6789，电脑手机一致 */
+/* 底部 1–9：三行 123 / 456 / 789 */
 .palette {
   display: flex;
   flex-direction: column;

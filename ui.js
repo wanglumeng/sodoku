@@ -159,6 +159,8 @@
     row1.className = 'palette-row';
     var row2 = document.createElement('div');
     row2.className = 'palette-row';
+    var row3 = document.createElement('div');
+    row3.className = 'palette-row';
     for (var n = 1; n <= 9; n++) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -166,11 +168,13 @@
       b.textContent = String(n);
       b.dataset.digit = String(n);
       b.addEventListener('click', onPaletteClick.bind(null, n));
-      if (n <= 5) row1.appendChild(b);
-      else row2.appendChild(b);
+      if (n <= 3) row1.appendChild(b);
+      else if (n <= 6) row2.appendChild(b);
+      else row3.appendChild(b);
     }
     paletteEl.appendChild(row1);
     paletteEl.appendChild(row2);
+    paletteEl.appendChild(row3);
   }
 
   function render() {
