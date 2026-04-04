@@ -155,6 +155,10 @@
 
   function buildPalette() {
     paletteEl.innerHTML = '';
+    var row1 = document.createElement('div');
+    row1.className = 'palette-row';
+    var row2 = document.createElement('div');
+    row2.className = 'palette-row';
     for (var n = 1; n <= 9; n++) {
       var b = document.createElement('button');
       b.type = 'button';
@@ -162,8 +166,11 @@
       b.textContent = String(n);
       b.dataset.digit = String(n);
       b.addEventListener('click', onPaletteClick.bind(null, n));
-      paletteEl.appendChild(b);
+      if (n <= 5) row1.appendChild(b);
+      else row2.appendChild(b);
     }
+    paletteEl.appendChild(row1);
+    paletteEl.appendChild(row2);
   }
 
   function render() {
@@ -197,6 +204,30 @@
     render();
   }
 
+  /** 主输入为触控（手机等）时不抢焦点到隐藏 input，避免系统键盘弹出 */
+  function shouldFocusKeyProxy() {
+    try {
+      return !window.matchMedia('(pointer: coarse)').matches;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function configureKeyProxyForDevice() {
+    if (!keyProxy) return;
+    if (shouldFocusKeyProxy()) {
+      try {
+        keyProxy.readOnly = false;
+      } catch (e) {}
+      keyProxy.setAttribute('inputmode', 'numeric');
+    } else {
+      try {
+        keyProxy.readOnly = true;
+      } catch (e2) {}
+      keyProxy.setAttribute('inputmode', 'none');
+    }
+  }
+
   function onBoardFocusIn(ev) {
     var t = ev && ev.target;
     if (t && t.classList && t.classList.contains('cell') && keyProxy) {
@@ -204,13 +235,16 @@
       var fc = parseInt(t.dataset.col, 10);
       if (!isNaN(fr) && !isNaN(fc)) {
         keyProxyTarget = { row: fr, col: fc };
-        requestAnimationFrame(function () {
-          try {
-            keyProxy.focus({ preventScroll: true });
-          } catch (e) {
-            keyProxy.focus();
-          }
-        });
+        if (shouldFocusKeyProxy()) {
+          requestAnimationFrame(function () {
+            configureKeyProxyForDevice();
+            try {
+              keyProxy.focus({ preventScroll: true });
+            } catch (e) {
+              keyProxy.focus();
+            }
+          });
+        }
       }
     }
     syncSelectionFromFocusedCell();
@@ -483,7 +517,9 @@
     keyProxy.style.cssText =
       'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;margin:0;padding:0;border:0;pointer-events:none;font-size:16px;';
     keyProxy.addEventListener('compositionend', onKeyProxyCompositionEnd, false);
+    keyProxy.tabIndex = -1;
     document.body.appendChild(keyProxy);
+    configureKeyProxyForDevice();
   }
 
   function onGlobalFocusIn(ev) {
@@ -779,6 +815,11 @@
   function init() {
     kbdLogEnabled = /[?&]kbdlog=1(?:&|$)/.test(location.search);
     ensureKeyProxy();
+    try {
+      var mqCoarse = window.matchMedia('(pointer: coarse)');
+      if (mqCoarse.addEventListener) mqCoarse.addEventListener('change', configureKeyProxyForDevice);
+      else if (mqCoarse.addListener) mqCoarse.addListener(configureKeyProxyForDevice);
+    } catch (eMq) {}
     initTheme();
     closeAllDialogs();
     buildBoardDom();
