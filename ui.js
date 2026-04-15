@@ -19,6 +19,8 @@
   var btnModalCancel = document.getElementById('modal-cancel');
   var victoryModal = document.getElementById('modal-victory');
   var btnVictoryClose = document.getElementById('victory-close');
+  var CHECK_LABEL = '检查谜题';
+  var CLEAR_ERRORS_LABEL = '清空错误';
 
   /** @type {number[][]} */
   var board = [];
@@ -32,6 +34,8 @@
   var highlightDigit = 0;
   /** 检查谜题后错误格的 key Set("r,c") */
   var wrongCells = null;
+  /** true 时“检查谜题”按钮进入“清空错误”模式 */
+  var clearErrorsMode = false;
 
   var cells = [];
   /** URL ?kbdlog=1 时写入 sessionStorage.debug924cd9 供底部面板显示 */
@@ -282,6 +286,36 @@
 
   function clearWrongMarks() {
     wrongCells = null;
+    clearErrorsMode = false;
+    if (btnCheck) btnCheck.textContent = CHECK_LABEL;
+  }
+
+  function enableClearErrorsMode() {
+    clearErrorsMode = true;
+    if (btnCheck) btnCheck.textContent = CLEAR_ERRORS_LABEL;
+  }
+
+  function clearMarkedErrors() {
+    if (!wrongCells || wrongCells.size === 0) {
+      clearWrongMarks();
+      setMessage('当前没有已标记的错误。');
+      render();
+      return;
+    }
+    var changed = 0;
+    wrongCells.forEach(function (key) {
+      var parts = key.split(',');
+      var r = parseInt(parts[0], 10);
+      var c = parseInt(parts[1], 10);
+      if (isNaN(r) || isNaN(c) || r < 0 || r > 8 || c < 0 || c > 8) return;
+      if (!given[r][c] && board[r][c] !== 0) {
+        board[r][c] = 0;
+        changed++;
+      }
+    });
+    clearWrongMarks();
+    setMessage(changed > 0 ? '已清空标记为冲突的数字。' : '已标记格中无可清空数字。');
+    render();
   }
 
   /** 主键盘数字行 Digit1–9、小键盘 Numpad1–9（按物理键 code，避免部分布局下 key 非 1–9） */
@@ -702,6 +736,8 @@
   function checkPuzzle() {
     var conflicts = conflictKeys(board);
     if (conflicts.size > 0) {
+      wrongCells = new Set(conflicts);
+      enableClearErrorsMode();
       setMessage('存在冲突，请修正标红的格子。');
       render();
       return;
@@ -723,6 +759,7 @@
       for (var i = 0; i < wrong.length; i++) {
         wrongCells.add(wrong[i][0] + ',' + wrong[i][1]);
       }
+      enableClearErrorsMode();
       if (empties > 0) {
         setMessage('有 ' + wrong.length + ' 个已填数字与最终解冲突（已标记）。');
       } else {
@@ -737,6 +774,7 @@
       render();
       return;
     }
+    clearWrongMarks();
     setMessage('恭喜，全部正确！');
     showVictoryCelebration();
   }
@@ -880,7 +918,10 @@
       });
     }
     if (btnClear) btnClear.addEventListener('click', clearUserInputs);
-    btnCheck.addEventListener('click', checkPuzzle);
+    btnCheck.addEventListener('click', function () {
+      if (clearErrorsMode) clearMarkedErrors();
+      else checkPuzzle();
+    });
     btnSolve.addEventListener('click', solvePuzzle);
     btnTheme.addEventListener('click', toggleTheme);
     if (victoryModal) {
