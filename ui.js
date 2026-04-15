@@ -12,6 +12,7 @@
   var messageEl = document.getElementById('message');
   var modal = document.getElementById('modal-difficulty');
   var btnNew = document.getElementById('btn-new');
+  var btnClear = document.getElementById('btn-clear');
   var btnCheck = document.getElementById('btn-check');
   var btnSolve = document.getElementById('btn-solve');
   var btnTheme = document.getElementById('btn-theme');
@@ -706,13 +707,15 @@
       return;
     }
     var wrong = [];
+    var empties = 0;
     for (var r = 0; r < 9; r++) {
       for (var c = 0; c < 9; c++) {
         if (board[r][c] === 0) {
-          setMessage('还有空格未填。');
-          return;
+          empties++;
+          continue;
         }
-        if (board[r][c] !== solution[r][c]) wrong.push([r, c]);
+        // 未填满时也检查“未来冲突”：当前已填值若偏离唯一解，后续必然出错。
+        if (!given[r][c] && board[r][c] !== solution[r][c]) wrong.push([r, c]);
       }
     }
     if (wrong.length > 0) {
@@ -720,12 +723,39 @@
       for (var i = 0; i < wrong.length; i++) {
         wrongCells.add(wrong[i][0] + ',' + wrong[i][1]);
       }
-      setMessage('有 ' + wrong.length + ' 格与解答不符（已标记）。');
+      if (empties > 0) {
+        setMessage('有 ' + wrong.length + ' 个已填数字与最终解冲突（已标记）。');
+      } else {
+        setMessage('有 ' + wrong.length + ' 格与解答不符（已标记）。');
+      }
+      render();
+      return;
+    }
+    if (empties > 0) {
+      clearWrongMarks();
+      setMessage('当前已填数字都正确，继续加油！');
       render();
       return;
     }
     setMessage('恭喜，全部正确！');
     showVictoryCelebration();
+  }
+
+  function clearUserInputs() {
+    var changed = 0;
+    for (var r = 0; r < 9; r++) {
+      for (var c = 0; c < 9; c++) {
+        if (!given[r][c] && board[r][c] !== 0) {
+          board[r][c] = 0;
+          changed++;
+        }
+      }
+    }
+    selected = null;
+    highlightDigit = 0;
+    clearWrongMarks();
+    setMessage(changed > 0 ? '已清空你填入的数字。' : '当前没有可清空的已填数字。');
+    render();
   }
 
   function solvePuzzle() {
@@ -849,6 +879,7 @@
         if (d === 'easy' || d === 'medium' || d === 'hard') startGame(d);
       });
     }
+    if (btnClear) btnClear.addEventListener('click', clearUserInputs);
     btnCheck.addEventListener('click', checkPuzzle);
     btnSolve.addEventListener('click', solvePuzzle);
     btnTheme.addEventListener('click', toggleTheme);
