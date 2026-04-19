@@ -131,10 +131,12 @@
       var minOpt = 10;
       var used;
       var n;
-      for (r = 0; r < 9; r++) {
-        for (c = 0; c < 9; c++) {
-          if (board[r][c] !== 0) continue;
-          used = rows[r] | cols[c] | boxes[boxIndex(r, c)];
+      var rr;
+      var cc;
+      for (rr = 0; rr < 9; rr++) {
+        for (cc = 0; cc < 9; cc++) {
+          if (board[rr][cc] !== 0) continue;
+          used = rows[rr] | cols[cc] | boxes[boxIndex(rr, cc)];
           var opts = 0;
           for (n = 1; n <= 9; n++) {
             if ((used & (1 << (n - 1))) === 0) opts++;
@@ -142,8 +144,8 @@
           if (opts === 0) return 0;
           if (opts < minOpt) {
             minOpt = opts;
-            bestR = r;
-            bestC = c;
+            bestR = rr;
+            bestC = cc;
             if (minOpt === 1) break;
           }
         }
@@ -152,19 +154,19 @@
       if (bestR < 0) return 1;
 
       var acc = 0;
-      bi = boxIndex(bestR, bestC);
-      used = rows[bestR] | cols[bestC] | boxes[bi];
+      var biLocal = boxIndex(bestR, bestC);
+      used = rows[bestR] | cols[bestC] | boxes[biLocal];
       for (n = 1; n <= 9; n++) {
         if ((used & (1 << (n - 1))) !== 0) continue;
-        bit = 1 << (n - 1);
+        var bitMask = 1 << (n - 1);
         board[bestR][bestC] = n;
-        rows[bestR] |= bit;
-        cols[bestC] |= bit;
-        boxes[bi] |= bit;
+        rows[bestR] |= bitMask;
+        cols[bestC] |= bitMask;
+        boxes[biLocal] |= bitMask;
         acc += rec();
-        rows[bestR] ^= bit;
-        cols[bestC] ^= bit;
-        boxes[bi] ^= bit;
+        rows[bestR] ^= bitMask;
+        cols[bestC] ^= bitMask;
+        boxes[biLocal] ^= bitMask;
         board[bestR][bestC] = 0;
         if (acc >= limit) return acc;
       }
